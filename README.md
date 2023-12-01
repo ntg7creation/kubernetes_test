@@ -36,6 +36,7 @@ RBAC was enabledverify
 
 ## deploy the base app
  my deployment file includes the services 
+ 
 `kubectl apply -f deployment.yaml`
 
 ### deploy ingress
