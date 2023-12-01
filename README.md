@@ -35,6 +35,7 @@ RBAC was enabledverify
 `az aks get-credentials -g myResourceGroup -n myAKSCluster`
 
 ## deploy the base app
+ my deployment file includes the services 
 `kubectl apply -f deployment.yaml`
 
 ### deploy ingress
