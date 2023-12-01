@@ -60,6 +60,8 @@ add your ingress file
 
 you can find the app on
 http://20.81.97.59/service-A
+
 http://20.81.97.59/service-B only a service and nothing is implamented (no deployment as of now)
+
 and by defualt will lead to service A
 http://20.81.97.59
