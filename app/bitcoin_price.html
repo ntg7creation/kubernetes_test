@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bitcoin Price Tracker</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      .price-table {
+        width: 70%;
+        margin: 20px auto;
+        border-collapse: collapse;
+      }
+
+      .price-table th,
+      .price-table td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+      }
+
+      .price-table th {
+        background-color: #f2f2f2;
+      }
+
+      .price-table td {
+        background-color: #fff;
+      }
+
+      .price-table td:first-child {
+        width: 30%;
+      }
+    </style>
+    <script>
+      const fetchedPrices = [];
+
+      function fetchBitcoinPrice(url) {
+        return fetch(url)
+          .then((response) => response.json())
+          .then((data) => {
+            const price = data.data.priceUsd;
+            const currentTime = new Date().toLocaleString();
+            return { price: parseFloat(price).toFixed(2), time: currentTime };
+          })
+          .catch((error) => {
+            console.error("Error fetching Bitcoin price:", error);
+            return { price: null, time: "" };
+          });
+      }
+
+      function updateBitcoinPriceTable() {
+        const capPromise = fetchBitcoinPrice(
+          "https://api.coincap.io/v2/assets/bitcoin"
+        );
+
+        capPromise.then((priceData) => {
+          const tableBody = document.getElementById("price-table-body");
+          const newRow = tableBody.insertRow(0);
+
+          const cellTime = newRow.insertCell(0);
+          const cellPrice = newRow.insertCell(1);
+
+          cellTime.textContent = priceData.time;
+          cellPrice.textContent =
+            priceData.price !== null
+              ? `$${priceData.price}`
+              : "Failed to fetch data";
+
+          fetchedPrices.unshift(parseFloat(priceData.price));
+          if (fetchedPrices.length > 10) {
+            fetchedPrices.pop();
+          }
+
+          updateAverage();
+        });
+      }
+
+      function updateAverage() {
+        const sum = fetchedPrices.reduce((acc, price) => acc + price, 0);
+        const averagePrice = (sum / fetchedPrices.length || 1).toFixed(2);
+        const averageDisplay = document.getElementById("average-display");
+        averageDisplay.textContent = `Average: $${averagePrice}`;
+      }
+
+      // Fetch Bitcoin price initially and update every minute
+      updateBitcoinPriceTable();
+      setInterval(updateBitcoinPriceTable, 60000);
+    </script>
+  </head>
+  <body>
+    <h1>Bitcoin Price Tracker</h1>
+    <div class="top-right" id="average-display">Average: Loading...</div>
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody id="price-table-body">
+        <!-- Table content will be inserted here dynamically -->
+      </tbody>
+    </table>
+  </body>
+</html>
